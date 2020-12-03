@@ -59,11 +59,15 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 
 
 	/**
+	 * 无参构造器会先调用父类的构造器
 	 * Create a new AnnotationConfigApplicationContext that needs to be populated
 	 * through {@link #register} calls and then manually {@linkplain #refresh refreshed}.
 	 */
 	public AnnotationConfigApplicationContext() {
+		// 添加注解读取BeanDefinition的读取器
 		this.reader = new AnnotatedBeanDefinitionReader(this);
+		// 添加注解扫描BeanDefinition的扫描器
+		// 作用，给单独调用scan()方法的方法使用，如果是带配置类的则会新建一个扫描器
 		this.scanner = new ClassPathBeanDefinitionScanner(this);
 	}
 
@@ -84,8 +88,11 @@ public class AnnotationConfigApplicationContext extends GenericApplicationContex
 	 * {@link Configuration @Configuration} classes
 	 */
 	public AnnotationConfigApplicationContext(Class<?>... componentClasses) {
+		// 调用构造函数，初始化beanFactory, reader, scanner
 		this();
+		// 注册自定义配置类
 		register(componentClasses);
+		// IoC容器刷新接口
 		refresh();
 	}
 

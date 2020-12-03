@@ -515,7 +515,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	@Override
 	public void refresh() throws BeansException, IllegalStateException {
 		synchronized (this.startupShutdownMonitor) {
-			// Prepare this context for refreshing.
+			// Prepare this context for refreshing. 准备刷新上下文环境
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
@@ -528,28 +528,33 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 				// Allows post-processing of the bean factory in context subclasses.
 				postProcessBeanFactory(beanFactory);
 
-				// Invoke factory processors registered as beans in the context.
+				// Invoke factory processors registered as beans in the context. 调用Bean工厂的后置处理器
+				// 功能1：在此将class扫描成BeanDefinition
+				// 功能2：注册BeanDefinition
 				invokeBeanFactoryPostProcessors(beanFactory);
 
-				// Register bean processors that intercept bean creation.
+				// Register bean processors that intercept bean creation. 注册Bean的后置处理器
+				// 功能1：
 				registerBeanPostProcessors(beanFactory);
 
-				// Initialize message source for this context.
+				// Initialize message source for this context. 初始化国际化资源处理器
 				initMessageSource();
 
-				// Initialize event multicaster for this context.
+				// Initialize event multicaster for this context. 创建事件多播器
 				initApplicationEventMulticaster();
 
-				// Initialize other special beans in specific context subclasses.
+				// Initialize other special beans in specific context subclasses. 留给子类实现
+				// 功能：springboot是从这个方法启动tomcat
 				onRefresh();
 
-				// Check for listener beans and register them.
+				// Check for listener beans and register them. 把我们的事件监听器注册到多播器上
 				registerListeners();
 
-				// Instantiate all remaining (non-lazy-init) singletons.
+				// Instantiate all remaining (non-lazy-init) singletons. 实例化我们剩下的单实例bean（使用beanDefinition 调用getBean 生产bean）
+				// 功能1：实例化单例bean
 				finishBeanFactoryInitialization(beanFactory);
 
-				// Last step: publish corresponding event.
+				// Last step: publish corresponding event. 最后容器刷新 发布刷新事件（Spring cloud 也是从这里启动的）
 				finishRefresh();
 			}
 
@@ -846,6 +851,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	/**
 	 * Finish the initialization of this context's bean factory,
 	 * initializing all remaining singleton beans.
+	 * 完成上下文bean工厂的初始化，开始初始剩下的所有单例bean
 	 */
 	protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
 		// Initialize conversion service for this context.
@@ -871,7 +877,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// Stop using the temporary ClassLoader for type matching.
 		beanFactory.setTempClassLoader(null);
 
-		// Allow for caching all bean definition metadata, not expecting further changes.
+		// Allow for caching all bean definition metadata, not expecting further changes. bean工厂冻结不在注册BeanDefinition
+		// 功能1：表示不再接受注册bean定义，开始生产bean了
 		beanFactory.freezeConfiguration();
 
 		// Instantiate all remaining (non-lazy-init) singletons.
